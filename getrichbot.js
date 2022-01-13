@@ -30,8 +30,9 @@ getrichbot 명령어 List
   매수 코인 리스트      /m show
 
 ## 계정 설정  /a, /account
-  access key           /a accesskey [your acccess key]
-  secret key           /a secretkey [your secret key]
+  계정 설정 확인        /a show   
+  access key         /a accesskey [your acccess key]
+  secret key         /a secretkey [your secret key]
   최대 매수 금액        /a amount [금액]
   매수 코인 개수        /a market [개수]  
 
@@ -248,6 +249,16 @@ bot.onText(/\/(a|account) (.*)/, async (msg, match) => {
 
   if (!resp) {
     message = "명령어를 확인하세요.";
+  } else if (resp == "show") {
+    const accountInfo = await accountDB.getAccount(msg.chat.id);
+    message = `최대 매수 금액 : ${accountInfo.max_amount}
+    매수 코인 개수 : ${accountInfo.max_markets}
+    Access Key : ${
+      accountInfo.access_key ? "등록 완료" : "키 등록이 필요합니다."
+    }
+    Secret Key : ${
+      accountInfo.secret_key ? "등록 완료" : "키 등록이 필요합니다."
+    }`;
   } else {
     const params = resp.split(" ");
     if (params[0] == "amount") {
