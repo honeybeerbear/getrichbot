@@ -2,11 +2,11 @@
   "name": "getrichbot",
   "version": "1.0.0",
   "description": "",
-  "main": "bot.js",
+  "main": "getrichbot.js",
   "type": "module",
   "scripts": {
-    "build": "cross-env NODE_ENV=production node bot.js",
-    "dev": "cross-env NODE_ENV=development node bot.js"
+    "build": "cross-env NODE_ENV=production node getrichbot.js",
+    "dev": "cross-env NODE_ENV=development node getrichbot.js"
   },
   "author": "",
   "license": "ISC",
