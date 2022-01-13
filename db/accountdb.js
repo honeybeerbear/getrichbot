@@ -118,7 +118,6 @@ export default class accountdb extends db {
         });
 
         if (idx > -1) list.splice(idx, 1);
-        console.log(list);
       }
     });
 
