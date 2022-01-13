@@ -30,6 +30,10 @@ getrichbot 명령어 List
   매수 코인 리스트      /m show
 
 ## 계정 설정  /a, /account
+  access key           /a accesskey [your acccess key]
+  secret key           /a secretkey [your secret key]
+  최대 매수 금액        /a amount [금액]
+  매수 코인 개수        /a market [개수]  
 
 ## 매수
   전체 매수            /b all         or    /buy all
@@ -40,10 +44,11 @@ getrichbot 명령어 List
   개별 매도            /s [코인명] 
 
 ## 자산 리스트
-  자산 리스트 조회      /list         or   /li`;
+  자산 리스트 조회      /list         or   /li
+`;
 
 const bot = new TelegramBot(token, { polling: true });
-const accountDB = new accountdb("account.json");
+const accountDB = new accountdb();
 accountDB.initialize();
 
 const getAccount = (chatid) => {
@@ -91,7 +96,6 @@ bot.onText(/\/자산|\/list|\/li/, async (msg, match) => {
       accountdata.secret_key
     );
 
-    console.log(accounts);
     let message = "";
     if (accounts) {
       let total = 0;
@@ -101,7 +105,6 @@ bot.onText(/\/자산|\/list|\/li/, async (msg, match) => {
           element.avg_buy_price == 0
             ? element.balance
             : element.balance * element.avg_buy_price;
-        console.log(krw_bal);
         if (krw_bal > 0) {
           message =
             message +
@@ -252,7 +255,7 @@ bot.onText(/\/(a|account) (.*)/, async (msg, match) => {
       if (isNaN(params[1])) {
         message = "숫자를 입력하세요.";
       } else {
-        accountDB.setMaxamount(msg.chat.id, params[1]);
+        accountDB.setMaxAmount(msg.chat.id, params[1]);
         message = `최대 매수 금액 ${params[1]} 을 등록하였습니다.`;
       }
     } else if (params[0] == "market") {
@@ -265,8 +268,12 @@ bot.onText(/\/(a|account) (.*)/, async (msg, match) => {
       }
     } else if (params[0] == "secretkey") {
       // secret key 등록
+      accountDB.setSecretKey(msg.chat.id, params[1]);
+      message = "secret key 등록 완료";
     } else if (params[0] == "accesskey") {
       // access key 등록
+      accountDB.setAccessKey(msg.chat.id, params[1]);
+      message = "access key 등록 완료";
     }
   }
   bot.sendMessage(msg.chat.id, message ? message : "명령어를 확인하세요.");
@@ -291,7 +298,7 @@ bot.onText(/\/(market|m) (.*)/, async (msg, match) => {
       return e.market;
     });
 
-    accountDB.insert(msg.chat.id, "markets", markets);
+    accountDB.insertAllMarket(msg.chat.id, "markets", markets);
     message = `다음의 코인을 매수 리스트에 등록 합니다.
       ${markets}`;
   } else if (resp == "show") {
@@ -304,14 +311,19 @@ bot.onText(/\/(market|m) (.*)/, async (msg, match) => {
   } else {
     const params = resp.split(" ");
     if (params[0] == "a") {
-      console.log("코인 추가");
+      const market = params[1].startsWith("KRW-")
+        ? params[1]
+        : "KRW-" + params[1];
+      accountDB.addMarket(msg.chat.id, market.toUpperCase());
+      message = `${market} 등록 완료`;
     } else if (params[0] == "d") {
       const market = params[1].startsWith("KRW-")
         ? params[1]
         : "KRW-" + params[1];
 
-      console.log(market.toUpperCase());
+      // console.log(market.toUpperCase());
       accountDB.removeMarket(msg.chat.id, market.toUpperCase());
+      message = `${market} 삭제 완료`;
     }
   }
 
@@ -343,7 +355,22 @@ bot.onText(/\/(p|price) (.*)/, async (msg, match) => {
   );
 });
 
-bot.on("new_chat_members", (msg) => {
+bot.onText(/\/start/, async (msg, match) => {
+  await accountDB.insertAccount(msg.chat.id, msg.chat.username);
+  const message = `
+  최초 사용자를 위한 사용 방법 안내
+  1) 업비트 access key 등록 : /a accesskey [upbit access key]
+  2) 업비트 secret key 등록 : /a secretkey [upbit secret key]
+  3) 매수 금액 설정         : /a amount [매수 금액]
+  4) 매수할 코인 개수 설정   : /a market [개수]
+  5) 매수 대상 코인 불러오기 : /m load
+
+  도움말 보기 /help
+  `;
+  bot.sendMessage(msg.chat.id, message);
+});
+
+bot.on("new_chat_members", async (msg) => {
   //   chat: {
   //     id: 627657893,
   //     first_name: 'j',
@@ -351,8 +378,18 @@ bot.on("new_chat_members", (msg) => {
   //     username: 'hoo_j_s',
   //     type: 'private'
   //   },
+  await accountDB.insertAccount(msg.chat.id, msg.chat.username);
+  const message = `
+  최초 사용자를 위한 사용 방법 안내
+  1) 업비트 access key 등록 : /a accesskey [upbit access key]
+  2) 업비트 secret key 등록 : /a secretkey [upbit secret key]
+  3) 매수 금액 설정         : /a amount [매수 금액]
+  4) 매수할 코인 개수 설정   : /a market [개수]
+  5) 매수 대상 코인 불러오기 : /m load
 
-  bot.sendMessage(msg.chat.id, welcomestr);
+  도움말 보기 /help
+  `;
+  bot.sendMessage(msg.chat.id, message);
 });
 
 // 신규 유저
