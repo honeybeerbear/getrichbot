@@ -14,7 +14,7 @@ if (process.env.NODE_ENV == "production") {
   dotenv.config({ path: path.join(__dirname, ".env.development.local") });
 }
 
-// @hbbupbitbot
+// 텔레그램 botfather 를 통해 생성한 token ID 입력
 const token = process.env.TELEGRAM_TOKEN;
 console.log(`run telegram bot Token ID is : ${token}`);
 
@@ -28,7 +28,7 @@ const startMessage = `
 
 도움말 보기 /help
 `;
-const welcomestr = `
+const welcomeMessage = `
 getrichbot 명령어 List
 
 # 도움말 표시         /help or /h
@@ -241,7 +241,7 @@ bot.onText(/\/(매수|buy|b)(.*)/, async (msg, match) => {
 });
 
 bot.onText(/\/help/, (msg, match) => {
-  bot.sendMessage(msg.chat.id, welcomestr);
+  bot.sendMessage(msg.chat.id, welcomeMessage);
 });
 
 bot.onText(/\/(a|account) (.*)/, async (msg, match) => {
@@ -369,21 +369,10 @@ bot.onText(/\/(p|price) (.*)/, async (msg, match) => {
 
 bot.onText(/\/start/, async (msg, match) => {
   await accountDB.insertAccount(msg.chat.id, msg.chat.username);
-
-  bot.sendMessage(msg.chat.id, message);
+  bot.sendMessage(msg.chat.id, startMessage);
 });
 
 bot.on("new_chat_members", async (msg) => {
   await accountDB.insertAccount(msg.chat.id, msg.chat.username);
-  const message = `
-  최초 사용자를 위한 사용 방법 안내
-  1) 업비트 access key 등록 : /a accesskey [upbit access key]
-  2) 업비트 secret key 등록 : /a secretkey [upbit secret key]
-  3) 매수 금액 설정         : /a amount [매수 금액]
-  4) 매수할 코인 개수 설정   : /a market [개수]
-  5) 매수 대상 코인 불러오기 : /m load
-
-  도움말 보기 /help
-  `;
-  bot.sendMessage(msg.chat.id, message);
+  bot.sendMessage(msg.chat.id, startMessage);
 });

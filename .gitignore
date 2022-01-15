@@ -23,4 +23,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # db data
-/db/data/*
+/db/data/*.json
+
+# vsc
+.eslinrc.js
+.prettier.js

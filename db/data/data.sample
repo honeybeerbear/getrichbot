@@ -1,0 +1,17 @@
+{
+  "name": "account.json",
+  "v": [
+    {
+      "chat_id": ,
+      "user_name": "",
+      "access_key": "",
+      "secret_key": "",
+      "max_amount": "20000",
+      "max_markets": "10",
+      "markets": [
+        "KRW-DOGE",
+        "KRW-ETH"
+      ]
+    }
+  ]
+}
