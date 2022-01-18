@@ -1,8 +1,8 @@
 const _sleep = (d) => new Promise((res) => setTimeout(res, d));
-let job = [];
+let _job = [];
 const cronbot = async () => {
-  const jobinfo = job.shift();
-  if (jobinfo) jobinfo();
+  const job = _job.shift();
+  if (job) job();
   await _sleep(200);
   return cronbot();
 };
@@ -10,8 +10,8 @@ const cronbot = async () => {
 cronbot();
 
 const orderbot = {
-  addJob: (arr) => {
-    job.push(arr);
+  addJob: (e) => {
+    _job.push(e);
   },
 };
 
