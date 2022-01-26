@@ -102,6 +102,12 @@ bot.onText(/\/자산|\/list|\/li/, async (msg, match) => {
     if (accounts) {
       let total = 0;
 
+      const currencyList = accounts
+        .map((e) => e.currency)
+        .filter((e) => e !== "KRW");
+      const priceList = await upbitapi.getPrices(currencyList);
+      console.log(currencyList, priceList);
+
       accounts.forEach((element) => {
         const krw_bal =
           element.avg_buy_price == 0
