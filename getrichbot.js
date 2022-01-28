@@ -35,17 +35,19 @@ getrichbot 명령어 List
 # 코인 시세 조회      /price [코인명]       or   /p [코인명]
 
 ## 마켓 설정
-  매수 대상 코인 추가   /m load       or /market load
-  매수 코인 삭제        /m d [코인명]  or /market d btc
-  매수 코인 추가        /m a [코인명]
-  매수 코인 리스트      /m show
+  매매 코인 자동 추가   /m load       or /market load
+   * 계정에 설정된 매매 코인 개수만큼 거래량 내림차순으로 추가
+  매매 코인 삭제        /m d [코인명]  or /market d btc
+  매매 코인 추가        /m a [코인명]
+  매매 코인 리스트      /m show
 
 ## 계정 설정  /a, /account
   계정 설정 확인        /a show   
   access key         /a accesskey [your acccess key]
   secret key         /a secretkey [your secret key]
   최대 매수 금액        /a amount [금액]
-  매수 코인 개수        /a market [개수]  
+  매매 코인 개수        /a market [개수]
+   * 자동으로 불러올 코인 개수 설정, /m load 명령어 실행
 
 ## 매수
   전체 매수            /b all         or    /buy all
