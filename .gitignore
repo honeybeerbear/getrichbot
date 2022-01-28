@@ -26,3 +26,6 @@ yarn-error.log*
 
 # db data
 /db/data/*.json
+
+# test code
+/test

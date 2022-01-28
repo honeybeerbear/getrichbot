@@ -24,7 +24,7 @@ const startMessage = `
 2) 업비트 secret key 등록 : /a secretkey [upbit secret key]
 3) 매수 금액 설정         : /a amount [매수 금액]
 4) 매수할 코인 개수 설정   : /a market [개수]
-5) 매수 대상 코인 불러오기 : /m load
+5) 매수 대상 코인 불러오기 : /m load 또는 /m a BTC
 
 도움말 보기 /help
 `;
@@ -98,31 +98,47 @@ bot.onText(/\/자산|\/list|\/li/, async (msg, match) => {
       accountdata.secret_key
     );
 
-    let message = "";
+    let message = "== KRW Market 자산 현황\r\n";
+
     if (accounts) {
       let total = 0;
 
+      const marketCodes = await upbitapi.getMarketCodes();
+      const marketCodesJson = JSON.parse(marketCodes);
+
       const currencyList = accounts
         .map((e) => e.currency)
-        .filter((e) => e !== "KRW");
+        .filter(
+          (e) => marketCodesJson.findIndex((ex) => ex.market == "KRW-" + e) > -1
+        );
       const priceList = await upbitapi.getPrices(currencyList);
-      console.log(currencyList, priceList);
+      const priceListJson = JSON.parse(priceList);
 
       accounts.forEach((element) => {
-        const krw_bal =
-          element.avg_buy_price == 0
-            ? element.balance
-            : element.balance * element.avg_buy_price;
-        if (krw_bal > 0) {
-          message =
-            message +
-            `${element.currency} : ${parseFloat(krw_bal)
-              .toFixed(2)
-              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")} 원 (${parseFloat(
-              element.balance
-            )
-              .toFixed(3)
-              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ${element.currency})\r\n`;
+        const price = priceListJson.filter(
+          (e) => e.market == "KRW-" + element.currency
+        )[0];
+        if (price) {
+          const tradePrice =
+            element.avg_buy_price == 0
+              ? element.balance
+              : element.balance * price.trade_price;
+
+          const buyPrice = element.balance * element.avg_buy_price;
+
+          if (tradePrice > 0) {
+            message =
+              message +
+              `${parseFloat(element.balance)
+                .toFixed(3)
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ${
+                element.currency
+              } : ${parseFloat(tradePrice)
+                .toFixed(2)
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원 (${parseFloat(
+                ((tradePrice - buyPrice) / buyPrice) * 100
+              ).toFixed(2)}%)\r\n`;
+          }
         }
       });
     }
